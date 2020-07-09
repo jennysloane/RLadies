@@ -1,0 +1,37 @@
+---
+title: "R Tips and Tricks"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# include fig.path = "figures/" to create a folder where all figures will be saved
+# label each chunk appropriately because that's what the figure will be saved as 
+knitr::opts_chunk$set(echo = TRUE, fig.path = "Figures/")
+```
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(papaja)
+library(ggeasy)
+library(ggbeeswarm)
+# geom_quasirandom() is similar to geom_jitter() but looks slightly nicer
+```
+
+```{r diamonds, fig.height=5, fig.width=5}
+mydat <- diamonds %>%
+  as_tibble() %>%
+  select(carat, cut, price) %>%
+  filter((cut == "Ideal" | cut == "Premium") & carat > 2) %>%
+  arrange(desc(price))
+
+ggplot(mydat, aes(price, carat, color=cut)) +
+  geom_point() +
+  facet_wrap(~cut) +
+  #theme_bw() +
+  theme_apa() + # apa theme with the papaja package!
+  easy_remove_legend() # ggeasy function to remove legend 
+
+
+```
+
+Learn R2D3!
