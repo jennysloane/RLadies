@@ -1,0 +1,79 @@
+---
+title: "world_cup"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(tidyr)
+library(plyr)
+library(broom) # tidy() glance()
+wwc_outcomes <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-07-09/wwc_outcomes.csv")
+squads <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-07-09/squads.csv")
+codes <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-07-09/codes.csv")
+```
+
+```{r}
+wwc_outcomes %>%
+  janitor::clean_names()
+
+wwc_outcomes %>%
+  summarise(min = min(year),
+            max = max(year))
+
+win <- wwc_outcomes %>%
+  filter(round == "Final") %>%
+  join(codes) %>%
+  select(year, win_status, country) %>%
+  mutate(win_loss = ifelse(win_status == "Lost", 0, 1)) %>%
+  select(country, win_loss)
+
+win <- ddply(win, .(country), summarise, sum = sum(win_loss))
+
+win %>%
+  arrange(desc(sum)) %>%
+  ggplot(aes(x = reorder(country, sum), y = sum, fill = country)) +
+  geom_col() + 
+  theme_bw() +
+  coord_flip() + 
+  theme(legend.position= "none")
+```
+
+```{r}
+win <- wwc_outcomes %>%
+  #filter(round == "Final") %>%
+  join(codes) %>%
+  select(year, win_status, country, round) %>%
+  mutate(win_loss = ifelse(win_status == "Lost", 0, 1)) %>%
+  select(country, win_loss, round) %>%
+  group_by(round)
+
+win <- ddply(win, .(country, round), summarise, sum = sum(win_loss))
+
+win %>%
+  arrange(desc(sum)) %>%
+  ggplot(aes(x = reorder(country, sum), y = sum, fill = country)) +
+  geom_col() + 
+  theme_bw() +
+  facet_wrap(~round) +
+  coord_flip() + 
+  theme(legend.position= "none")
+```
+
+US players 
+```{r}
+squads %>%
+  filter(country == "US" & goals > 10) %>%
+  select(pos, player, age, goals) %>%
+  arrange(desc(goals)) %>%
+  ggplot(aes(reorder(player, goals), goals, fill = player)) +
+  geom_col() +
+  theme_bw() +
+  coord_flip() + 
+  theme(legend.position= "none",
+        text = element_text(size=20)) +
+  labs(title = "Number of Goals by US Players", x="", y = "")
+```
+

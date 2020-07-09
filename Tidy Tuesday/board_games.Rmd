@@ -1,0 +1,61 @@
+---
+title: "board_games"
+author: "Jenny Sloane"
+date: "2 October 2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+read in board game data
+```{r}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+board_games <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-12/board_games.csv")
+```
+
+```{r}
+abst_strat <- board_games %>%
+  select(name, average_rating, users_rated, category, max_playtime) %>%
+  filter(average_rating > 7 & users_rated > 100 & category == "Abstract Strategy")
+
+abst_strat$name <- factor(abst_strat$name, levels = abst_strat$name[order(abst_strat$average_rating)])
+
+ggplot(abst_strat, aes(x=name, y = average_rating, fill=name)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw() +
+  labs(x="Name of Game", y = "Average Rating (1-10)", title = "Abstract Strategy Games with Highest Ratings") +
+  theme(legend.position = "none")
+
+```
+
+categories and average ratings
+```{r}
+board_games %>%
+  select(name, category, average_rating) %>%
+  mutate(average_rating = round((average_rating*100),0)) %>%
+  mutate(scale = ifelse(average_rating %in% 0:499, "<500",
+                        ifelse(average_rating %in% 500:800, "500-800", "900-1000"))) %>%
+  group_by(category, scale) %>%
+  count(scale) %>%
+  filter(n > 20)
+
+ratings <- board_games %>%
+  select(name, category, average_rating) %>%
+  filter(category == "Economic" | category == "Negotiation" | category == "Card Game" | category == "Abstract Strategy") %>%
+  mutate(average_rating = round((average_rating*100),0)) %>%
+  mutate(scale = ifelse(average_rating %in% 0:499, "<500",
+                        ifelse(average_rating %in% 500:600, "500-600",
+                        ifelse(average_rating %in% 600:700, "600-700",
+                        ifelse(average_rating %in% 700:800, "700-800", "900-1000")))))
+
+ggplot(ratings, aes(scale)) +
+  geom_bar(stat = "count") + 
+  theme_bw() +
+  labs(x="Scale (0-100)", y = "Number of Games") +
+  facet_wrap(~category)
+``` 
+
+

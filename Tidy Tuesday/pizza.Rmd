@@ -1,0 +1,71 @@
+---
+title: "pizza"
+author: "Jenny Sloane"
+date: "3 October 2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+pizza_jared <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_jared.csv")
+pizza_barstool <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_barstool.csv")
+pizza_datafiniti <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_datafiniti.csv")
+```
+
+
+```{r}
+
+pizza_barstool %>%
+  janitor::clean_names()
+
+
+pizza_barstool %>%
+  filter(city == "New York") %>% 
+  select(city, price_level, provider_rating) %>%
+  ggplot(aes(provider_rating)) +
+  geom_histogram() +
+  facet_wrap(~price_level)
+
+best_pizza <- pizza_barstool %>%
+  select(name, price_level, review_stats_dave_total_score) %>%
+  filter(review_stats_dave_total_score > 8.9) 
+
+best_pizza$name <- factor(best_pizza$name, levels = best_pizza$name[order(best_pizza$review_stats_dave_total_score)])
+
+ggplot(best_pizza, aes(name, review_stats_dave_total_score, fill = name)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+
+
+best_pizza_nyc <- pizza_barstool %>%
+  filter(city == "New York" & name != "Patsy's Pizzeria") %>%
+  select(name, price_level, review_stats_dave_total_score) %>%
+  filter(review_stats_dave_total_score > 8.5) 
+
+best_pizza_nyc$name <- factor(best_pizza_nyc$name, levels = best_pizza_nyc$name[order(best_pizza_nyc$review_stats_dave_total_score)])
+
+ggplot(best_pizza_nyc, aes(name, review_stats_dave_total_score, fill = name)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+  
+```
+
+```{r}
+pizza_j <- pizza_jared %>%
+  select(place, answer, total_votes) %>%
+  filter(answer == "Excellent" & total_votes > 20 & place != "NY Pizza Suprema")
+
+ggplot(pizza_j, aes(x = reorder(place, -total_votes), y = total_votes)) +
+  geom_bar(stat ="identity") +
+  coord_flip() +
+  theme_bw() 
+
+
+```
+
