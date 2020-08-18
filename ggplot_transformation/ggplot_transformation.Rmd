@@ -2,7 +2,7 @@
 title: "ggplot Transformation"
 output: html_document
 author: "Jenny Sloane"
-date: "July 7, 2020"
+date: "August 18, 2020"
 editor_options: 
   chunk_output_type: console
 ---
@@ -25,13 +25,16 @@ h3 { /* Header 3 */
  
 </style>
 
+<h3>Follow me <a href="https://twitter.com/jfsloane" target="_blank"> @jfsloane </a><br>
+My github page: <a href="https://github.com/jennysloane" target="_blank">https://github.com/jennysloane</a> <br><br>
+Data used in this talk can be found <a href="https://www.kaggle.com/crawford/80-cereals" target="_blank">here</a><br>
+This talk was inspired by  <a href="https://twitter.com/WeAreRLadies/status/1280859374668283906" target="_blank">this awesome R Ladies' Tweet</a></h3>
 
 <h2> Here, we will use ggplot to visualize how many grams of sugar are in different cereals. <br> 
-<h3>Data can be found <a href="https://www.kaggle.com/crawford/80-cereals" target="_blank">here</a><br>
-Inspiration from  <a href="https://twitter.com/WeAreRLadies/status/1280859374668283906" target="_blank">this awesome R Ladies' Tweet</a></h3>
+
+
 
 <center> <img src="cereals.jpeg" alt="cereal pic" width="500" height="350"> </center> <br>
-<h2>We will start with a basic box plot and get more creative with our visualisations as we go! </h2>
 
 
 <h3> Load  libraries </h3>
@@ -74,7 +77,7 @@ sugar <- mydat %>% # grams of sugar
 sugar
 ```
 
-<h2> We will start with the most basic box plot </h2>
+<h2>We will start with a basic box plot and get more creative with our visualisations as we go! </h2>
 ```{r}
 ggplot(sugar, aes(x=mfr, y=sugars)) +
   geom_boxplot()
